@@ -1,0 +1,179 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_MENSAGENS 10
+#define MAX_CONTATOS 10
+#define MAX_HISTORICO 10
+
+struct Mensagem {
+    char conteudo[100];
+};
+
+struct Contato {
+    char nome[50];
+    char telefone[20];
+};
+
+struct Historico {
+    char descricao[100];
+};
+
+struct Celular {
+    int bateria;
+    int creditos;
+    struct Mensagem mensagens[MAX_MENSAGENS];
+    int numMensagens;
+    struct Contato contatos[MAX_CONTATOS];
+    int numContatos;
+    struct Historico historico[MAX_HISTORICO];
+    int numHistorico;
+    char operadora[50];
+};
+
+void mostrarMenu();
+void verNivelBateria(struct Celular *cel);
+void gerenciarMensagens(struct Celular *cel);
+void gerenciarAgenda(struct Celular *cel);
+void realizarLigacao(struct Celular *cel);
+void verCreditos(struct Celular *cel);
+void verOperadora(struct Celular *cel);
+
+void mostrarMenu() {
+    printf("\n==== Sistema Operacional de Celular ====\n");
+    printf("1. Ver nível de bateria\n");
+    printf("2. Mensagens\n");
+    printf("3. Realizar ligação\n");
+    printf("4. Agenda\n");
+    printf("5. Créditos\n");
+    printf("6. Ver operadora\n");
+    printf("0. Sair\n");
+    printf("========================================\n");
+}
+
+void verNivelBateria(struct Celular *cel) {
+    printf("\n--- Nível de Bateria ---\n");
+    printf("Bateria atual: %d%%\n", cel->bateria);
+}
+
+void gerenciarMensagens(struct Celular *cel) {
+    int opcao = -1;
+    while (opcao != 0) {
+        printf("\n--- Mensagens ---\n");
+        if (cel->numMensagens == 0) {
+            printf("Nenhuma mensagem disponível.\n");
+        } else {
+            for (int i = 0; i < cel->numMensagens; i++) {
+                printf("[%d] %s\n", i + 1, cel->mensagens[i].conteudo);
+            }
+        }
+
+        printf("\n1. Adicionar nova mensagem\n");
+        printf("0. Voltar ao menu inicial\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        if (opcao == 1) {
+            if (cel->numMensagens < MAX_MENSAGENS) {
+                printf("Digite a mensagem: ");
+                scanf(" %[^\n]", cel->mensagens[cel->numMensagens].conteudo);
+                cel->numMensagens++;
+                printf("Mensagem adicionada!\n");
+            } else {
+                printf("Limite de mensagens alcançado!\n");
+            }
+        } else if (opcao != 0) {
+            printf("Opção inválida! Tente novamente.\n");
+        }
+    }
+}
+
+void gerenciarAgenda(struct Celular *cel) {
+    int opcao = -1;
+    while (opcao != 0) {
+        printf("\n--- Agenda ---\n");
+        if (cel->numContatos == 0) {
+            printf("Nenhum contato salvo.\n");
+        } else {
+            for (int i = 0; i < cel->numContatos; i++) {
+                printf("[%d] Nome: %s | Telefone: %s\n", i + 1, cel->contatos[i].nome, cel->contatos[i].telefone);
+            }
+        }
+
+        printf("\n1. Adicionar novo contato\n");
+        printf("0. Voltar ao menu inicial\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        if (opcao == 1) {
+            if (cel->numContatos < MAX_CONTATOS) {
+                printf("Digite o nome do contato: ");
+                scanf(" %[^\n]", cel->contatos[cel->numContatos].nome);
+                printf("Digite o telefone do contato: ");
+                scanf(" %[^\n]", cel->contatos[cel->numContatos].telefone);
+                cel->numContatos++;
+                printf("Contato adicionado!\n");
+            } else {
+                printf("Limite de contatos alcançado!\n");
+            }
+        } else if (opcao != 0) {
+            printf("Opção inválida! Tente novamente.\n");
+        }
+    }
+}
+
+void realizarLigacao(struct Celular *cel) {
+    if (cel->creditos < 2) {
+        printf("\nCréditos insuficientes para realizar a ligação!\n");
+        return;
+    }
+
+    char numero[20];
+    printf("Insira o número para realizar a ligação: ");
+    scanf(" %[^\n]", numero);
+
+    cel->creditos -= 2;
+    strcpy(cel->historico[cel->numHistorico].descricao, numero);
+    cel->numHistorico++;
+    printf("Ligação realizada para %s! Créditos restantes: %d\n", numero, cel->creditos);
+}
+
+void verCreditos(struct Celular *cel) {
+    printf("\n--- Créditos ---\n");
+    printf("Créditos disponíveis: %d\n", cel->creditos);
+}
+
+void verOperadora(struct Celular *cel) {
+    printf("\n--- Operadora ---\n");
+    printf("Operadora atual: %s\n", cel->operadora);
+}
+
+int main() {
+    struct Celular meuCelular = {100, 10, {}, 0, {}, 0, {}, 0, "Vivo"};
+    int opcao = -1;
+
+    while (opcao != 0) {
+        mostrarMenu();
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        if (opcao == 1) {
+            verNivelBateria(&meuCelular);
+        } else if (opcao == 2) {
+            gerenciarMensagens(&meuCelular);
+        } else if (opcao == 3) {
+            realizarLigacao(&meuCelular);
+        } else if (opcao == 4) {
+            gerenciarAgenda(&meuCelular);
+        } else if (opcao == 5) {
+            verCreditos(&meuCelular);
+        } else if (opcao == 6) {
+            verOperadora(&meuCelular);
+        } else if (opcao == 0) {
+            printf("Saindo...\n");
+        } else {
+            printf("Opção inválida! Tente novamente.\n");
+        }
+    }
+
+    return 0;
+}
